@@ -1,0 +1,56 @@
+name: besttol Wellness Surveillance
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  schedule:
+    # Run every 30 minutes around the clock for continuous surveillance
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wellness-check:
+    name: Wellness Check & Heal
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Run wellness checks (one-shot)
+        id: wellness
+        run: node src/index.js
+        continue-on-error: true
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Report wellness outcome
+        if: always()
+        run: |
+          echo "### besttol Wellness Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.wellness.outcome }}" = "success" ]; then
+            echo "✅ All ecosystem checks passed — system is **healthy**." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ One or more ecosystem checks reported degraded/unhealthy status." >> $GITHUB_STEP_SUMMARY
+            echo "Healing actions were attempted automatically." >> $GITHUB_STEP_SUMMARY
+          fi
