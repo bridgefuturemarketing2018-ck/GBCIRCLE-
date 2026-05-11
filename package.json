@@ -1,0 +1,13 @@
+{
+  "name": "besttol",
+  "version": "1.0.0",
+  "description": "Compliance — wellness surveillance and healing system for besttol ecosystems",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "monitor": "node src/index.js --daemon",
+    "test": "node --test tests/"
+  },
+  "keywords": ["health", "monitoring", "healing", "surveillance", "compliance"],
+  "license": "MIT"
+}
